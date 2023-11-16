@@ -1,17 +1,22 @@
 package by.anabios13.models;
 
+import java.util.List;
+
 public class Task {
 
     private int taskId;
     private String taskName;
-    private int projectId;
+    private Project project;
 
-    public Task(){}
+    private List<Employee> performers;
 
-    public Task(int taskId, String taskName, int projectId) {
+    public Task() {
+    }
+
+    public Task(int taskId, String taskName, Project project) {
         this.taskId = taskId;
         this.taskName = taskName;
-        this.projectId = projectId;
+        this.project = project;
     }
 
     public int getTaskId() {
@@ -30,12 +35,20 @@ public class Task {
         this.taskName = taskName;
     }
 
-    public int getProjectId() {
-        return projectId;
+    public Project getProject() {
+        return project;
     }
 
-    public void setProjectId(int projectId) {
-        this.projectId = projectId;
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public List<Employee> getPerformers() {
+        return performers;
+    }
+
+    public void setPerformers(List<Employee> performers) {
+        this.performers = performers;
     }
 }
 

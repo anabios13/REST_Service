@@ -1,9 +1,13 @@
 package by.anabios13.models;
 
+import java.util.List;
+
 public class Employee {
 
     private int employeeId;
     private String employeeName;
+
+    private List<Task> tasks;
 
     public Employee(){}
 
@@ -25,6 +29,14 @@ public class Employee {
 
     public void setEmployeeName(String employeeName) {
         this.employeeName = employeeName;
+    }
+
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
     }
 }
 

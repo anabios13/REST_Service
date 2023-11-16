@@ -4,6 +4,7 @@ import by.anabios13.db.DataSource;
 import by.anabios13.dto.TaskDTO;
 import by.anabios13.mappers.TaskMapper;
 import by.anabios13.models.Task;
+import com.google.gson.Gson;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+@WebServlet("/tasks")
 public class TaskServlet extends HttpServlet {
     public TaskServlet(){}
 
@@ -26,19 +28,21 @@ public class TaskServlet extends HttpServlet {
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             List<TaskDTO> taskDTOList = new ArrayList<>();
+            List<Task> taskList = new ArrayList<>();
 
             while (resultSet.next()) {
                 Task task = new Task();
                 task.setTaskId(resultSet.getInt("task_id"));
                 task.setTaskName(resultSet.getString("task_name"));
-                task.setProjectId(resultSet.getInt("project_id"));
-
-                TaskDTO taskDTO = TaskMapper.INSTANCE.taskToTaskDTO(task);
-                taskDTOList.add(taskDTO);
+      //          task.setProjectId(resultSet.getInt("project_id"));
+                taskList.add(task);
+//                TaskDTO taskDTO = TaskMapper.INSTANCE.taskToTaskDTO(task);
+//                taskDTOList.add(taskDTO);
             }
-
+            String jsonString = new Gson().toJson(taskList);
             // Отправка списка DTO клиенту, например, в формате JSON
-            response.getWriter().write(taskDTOList.toString());
+            response.setContentType("application/json");
+            response.getWriter().write(jsonString);
 
         } catch (SQLException e) {
             e.printStackTrace();

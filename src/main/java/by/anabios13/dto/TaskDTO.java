@@ -1,17 +1,25 @@
 package by.anabios13.dto;
 
+import by.anabios13.models.Employee;
+import by.anabios13.models.Project;
+
+import java.util.List;
+
 public class TaskDTO {
 
     private int taskId;
     private String taskName;
-    private int projectId;
+    private Project project;
 
-    public TaskDTO(){}
+    private List<Employee> performers;
 
-    public TaskDTO(int taskId, String taskName, int projectId) {
+    public TaskDTO() {
+    }
+
+    public TaskDTO(int taskId, String taskName, Project project) {
         this.taskId = taskId;
         this.taskName = taskName;
-        this.projectId = projectId;
+        this.project = project;
     }
 
     public int getTaskId() {
@@ -30,12 +38,20 @@ public class TaskDTO {
         this.taskName = taskName;
     }
 
-    public int getProjectId() {
-        return projectId;
+    public Project getProject() {
+        return project;
     }
 
-    public void setProjectId(int projectId) {
-        this.projectId = projectId;
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public List<Employee> getPerformers() {
+        return performers;
+    }
+
+    public void setPerformers(List<Employee> performers) {
+        this.performers = performers;
     }
 }
 

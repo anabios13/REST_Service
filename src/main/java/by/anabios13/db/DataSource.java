@@ -8,7 +8,15 @@ import java.sql.SQLException;
 
 public class DataSource {
 
-    private final static HikariConfig config = new HikariConfig("db.properties");
+    static {
+        try {
+            Class.forName("org.postgresql.Driver"); // Загрузка драйвера PostgreSQL
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Error connecting with database");
+        }
+    }
+
+    private final static HikariConfig config = new HikariConfig("/db.properties");
     private final static HikariDataSource ds = new HikariDataSource(config);
 
     private DataSource() {
