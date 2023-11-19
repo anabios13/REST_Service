@@ -4,6 +4,7 @@ import by.anabios13.models.Task;
 import by.anabios13.repositories.impl.EmployeeRepository;
 import by.anabios13.repositories.impl.ProjectRepository;
 import by.anabios13.repositories.impl.TaskRepository;
+import by.anabios13.util.PropertiesUtil;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.PortBinding;
@@ -33,9 +34,9 @@ class TaskRepositoryTest {
     @Container
     public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:15-alpine")
             .withDatabaseName("aston_rest_service_db")
-            .withUsername("postgres")
-            .withPassword("12345")
-            .withEnv("POSTGRES_PASSWORD", "12345")
+            .withUsername(PropertiesUtil.getProperties("dataSource.user"))
+            .withPassword(PropertiesUtil.getProperties("dataSource.password"))
+            .withEnv("POSTGRES_PASSWORD", PropertiesUtil.getProperties("dataSource.password"))
             .withExposedPorts(containerPort)
             .withCreateContainerCmdModifier(cmd -> cmd.withHostConfig(
                     new HostConfig().withPortBindings(new PortBinding(Ports.Binding.bindPort(localPort), new ExposedPort(containerPort)))
