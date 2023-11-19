@@ -2,7 +2,6 @@ package by.anabios13.servlets;
 
 import by.anabios13.db.DataSource;
 import by.anabios13.dto.TaskDTO;
-import by.anabios13.mappers.TaskMapper;
 import by.anabios13.models.Task;
 import com.google.gson.Gson;
 import jakarta.servlet.annotation.WebServlet;

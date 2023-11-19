@@ -1,12 +1,13 @@
 package by.anabios13.repositories.impl;
 
+import by.anabios13.models.Task;
+import by.anabios13.repositories.IEmployeeRepository;
 import by.anabios13.db.DataSource;
 import by.anabios13.exceptions.CRUDException;
 import by.anabios13.exceptions.CreateException;
 import by.anabios13.exceptions.DeleteException;
 import by.anabios13.exceptions.ReadException;
 import by.anabios13.models.Employee;
-import by.anabios13.repositories.IEmployeeRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,7 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeRepository implements IEmployeeRepository {
+
+    private ProjectRepository projectRepository;
     private List<Employee> employees;
+
+    public EmployeeRepository(ProjectRepository projectRepository) {
+        this.projectRepository = projectRepository;
+    }
+
     @Override
     public List<Employee> getAllEmployees() {
         employees = new ArrayList<>();
@@ -31,7 +39,7 @@ public class EmployeeRepository implements IEmployeeRepository {
                 Employee employee = new Employee();
                 employee.setEmployeeId(resultSet.getInt("employee_id"));
                 employee.setEmployeeName(resultSet.getString("employee_name"));
-               // employee.setTasks();
+                employee.setTasks(getTasksForEmployee(employee.getEmployeeId()));
                 employees.add(employee);
             }
         } catch (SQLException e) {
@@ -40,6 +48,35 @@ public class EmployeeRepository implements IEmployeeRepository {
         }
 
         return employees;
+    }
+
+    public List<Task> getTasksForEmployee(int employeeId) {
+        List<Task> taskList = new ArrayList<>();
+
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "SELECT t.* FROM Task t " +
+                             "JOIN TaskEmployee te ON t.task_id = te.task_id " +
+                             "WHERE te.employee_id = ?")) {
+
+            preparedStatement.setInt(1, employeeId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Task task = new Task();
+                int  project_id = resultSet.getInt("project_id");
+                task.setTaskId(resultSet.getInt("task_id"));
+                task.setTaskName(resultSet.getString("task_name"));
+                task.setProject(projectRepository.getProjectById(project_id));
+                taskList.add(task);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Обработка ошибок
+        }
+
+        return taskList;
     }
 
     @Override

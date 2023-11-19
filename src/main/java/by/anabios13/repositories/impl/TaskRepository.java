@@ -1,8 +1,9 @@
 package by.anabios13.repositories.impl;
 
 import by.anabios13.db.DataSource;
-import by.anabios13.exceptions.CRUDException;
+import by.anabios13.models.Employee;
 import by.anabios13.models.Task;
+import by.anabios13.exceptions.CRUDException;
 import by.anabios13.repositories.ITaskRepository;
 
 import java.sql.Connection;
@@ -14,9 +15,15 @@ import java.util.List;
 
 public class TaskRepository implements ITaskRepository {
 
-    private ProjectRepository projectRepository = new ProjectRepository();
-    private EmployeeRepository employeeRepository = new EmployeeRepository();
+    private ProjectRepository projectRepository;
+    private EmployeeRepository employeeRepository;
+    private static TaskRepository taskRepository;
     private List<Task> taskList;
+
+    public TaskRepository(ProjectRepository projectRepository, EmployeeRepository employeeRepository) {
+        this.projectRepository = projectRepository;
+        this.employeeRepository = employeeRepository;
+    }
 
     @Override
     public List<Task> getAllTasks() {
@@ -61,7 +68,7 @@ public class TaskRepository implements ITaskRepository {
                 Task task = new Task();
                 task.setTaskId(resultSet.getInt("task_id"));
                 task.setTaskName(resultSet.getString("task_name"));
-                task.setProject(projectRepository.getProjectById(projectId));
+                task.setPerformers(getEmployeesForTask(task.getTaskId()));
                 // task.setPerformers();
 
                 taskList.add(task);
@@ -90,7 +97,8 @@ public class TaskRepository implements ITaskRepository {
 
         } catch (SQLException e) {
             System.out.println(e.getStackTrace());
-            throw new CRUDException("An error occurred while trying to get task by id");
+            e.printStackTrace();
+            throw new CRUDException("An error occurred while trying to get task by id\n"+e.getMessage());
         }
 
         return task;
@@ -124,6 +132,33 @@ public class TaskRepository implements ITaskRepository {
         return taskList;
     }
 
+    public List<Employee> getEmployeesForTask(int taskId) {
+        List<Employee> employeeList = new ArrayList<>();
+
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "SELECT e.* FROM Employee e " +
+                             "JOIN TaskEmployee te ON e.employee_id = te.employee_id " +
+                             "WHERE te.task_id = ?")) {
+
+            preparedStatement.setInt(1, taskId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Employee employee = new Employee();
+                employee.setEmployeeId(resultSet.getInt("employee_id"));
+                employee.setEmployeeName(resultSet.getString("employee_name"));
+                employeeList.add(employee);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Обработка ошибок
+        }
+
+        return employeeList;
+    }
+
     @Override
     public void addTask(Task task) {
         try (Connection connection = DataSource.getConnection();
@@ -147,19 +182,19 @@ public class TaskRepository implements ITaskRepository {
     }
 
     @Override
-    public void updateTask(Task task) {
+    public void updateTask(Task changedTask) {
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "UPDATE task (task_id, task_name, project_id) VALUES (?, ?, ?)")) {
-            if(task.getProject().equals(null)||task.getTaskName().equals(null))
+            if(changedTask.getProject().equals(null)||changedTask.getTaskName().equals(null))
                 throw new CRUDException(
                         "An error occurred while trying to add new task." +
                                 "Incorrect data may have been entered"
                 );
 
-            preparedStatement.setInt(1, task.getTaskId());
-            preparedStatement.setString(2, task.getTaskName());
-            preparedStatement.setInt(3, task.getProject().getProjectId());
+            preparedStatement.setInt(1, changedTask.getTaskId());
+            preparedStatement.setString(2, changedTask.getTaskName());
+            preparedStatement.setInt(3, changedTask.getProject().getProjectId());
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {

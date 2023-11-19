@@ -1,8 +1,8 @@
 package by.anabios13.repositories.impl;
 
 import by.anabios13.db.DataSource;
-import by.anabios13.exceptions.CRUDException;
 import by.anabios13.models.Project;
+import by.anabios13.exceptions.CRUDException;
 import by.anabios13.repositories.IProjectRepository;
 
 import java.sql.Connection;
@@ -14,7 +14,11 @@ import java.util.List;
 
 public class ProjectRepository implements IProjectRepository {
 
-    private TaskRepository taskRepository = new TaskRepository();
+    private TaskRepository taskRepository;
+
+    public ProjectRepository(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
 
     public List<Project> getAllProjects(){
         List<Project> projects = new ArrayList<>();
