@@ -6,15 +6,9 @@ import java.util.List;
 
 public interface ITaskRepository {
 
-    List<Task> getAllTasks();
-
-    List<Task> getAllTasksByProject(int projectId);
-
-    Task getTaskById(int taskId);
-
-    void addTask(Task task);
-
-    void updateTask(Task task);
-
-    void deleteTask(int taskId);
+    Task save(Task task,int project_id);
+    Task findById(int taskId);
+    List<Task> findAll();
+    void update(Task task, int project_id);
+    void deleteById(int taskId);
 }

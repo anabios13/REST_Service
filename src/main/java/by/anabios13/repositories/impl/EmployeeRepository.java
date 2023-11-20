@@ -18,16 +18,21 @@ import java.util.List;
 
 public class EmployeeRepository implements IEmployeeRepository {
 
-    private ProjectRepository projectRepository;
-    private List<Employee> employees;
+    private static EmployeeRepository employeeRepository;
 
-    public EmployeeRepository(ProjectRepository projectRepository) {
-        this.projectRepository = projectRepository;
+    private EmployeeRepository() {
+    }
+
+    public static synchronized EmployeeRepository getEmployeeRepository() {
+        if (employeeRepository == null) {
+            employeeRepository = new EmployeeRepository();
+        }
+        return employeeRepository;
     }
 
     @Override
     public List<Employee> getAllEmployees() {
-        employees = new ArrayList<>();
+        List<Employee> employees = new ArrayList<>();
 
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
@@ -43,7 +48,7 @@ public class EmployeeRepository implements IEmployeeRepository {
                 employees.add(employee);
             }
         } catch (SQLException e) {
-            System.out.println(e.getStackTrace());
+            System.out.println(e.getMessage());
             throw new CRUDException("");
         }
 
@@ -64,10 +69,8 @@ public class EmployeeRepository implements IEmployeeRepository {
 
             while (resultSet.next()) {
                 Task task = new Task();
-                int  project_id = resultSet.getInt("project_id");
                 task.setTaskId(resultSet.getInt("task_id"));
                 task.setTaskName(resultSet.getString("task_name"));
-                task.setProject(projectRepository.getProjectById(project_id));
                 taskList.add(task);
             }
 
@@ -109,7 +112,7 @@ public class EmployeeRepository implements IEmployeeRepository {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println(e.getStackTrace());
+            System.out.println(e.getMessage());
             throw new CreateException("");
         }
     }

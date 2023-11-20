@@ -1,5 +1,7 @@
 package by.anabios13.models;
 
+import by.anabios13.repositories.impl.TaskRepository;
+
 import java.util.List;
 
 public class Employee {
@@ -32,6 +34,9 @@ public class Employee {
     }
 
     public List<Task> getTasks() {
+        if (tasks == null) {
+            tasks = TaskRepository.gatTaskRepository().findAll();
+        }
         return tasks;
     }
 

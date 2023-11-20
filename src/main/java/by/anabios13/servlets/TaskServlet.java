@@ -48,7 +48,5 @@ public class TaskServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error fetching tasks");
         }
     }
-
-    // Реализация других методов (create, update, delete) аналогичны с использованием PreparedStatement.
 }
 
