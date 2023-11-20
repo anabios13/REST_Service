@@ -11,4 +11,5 @@ public interface ITaskRepository {
     List<Task> findAll();
     void update(Task task, int project_id);
     void deleteById(int taskId);
+
 }

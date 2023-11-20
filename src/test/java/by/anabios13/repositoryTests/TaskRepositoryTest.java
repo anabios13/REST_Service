@@ -62,7 +62,7 @@ class TaskRepositoryTest {
 
         Task savedTask = taskRepository.save(task,project.getProjectId());
 
-        Assertions.assertNotNull(savedTask.getTaskId());
+        Assertions.assertNotEquals(0,task.getTaskId());
         Assertions.assertEquals("Test Task", savedTask.getTaskName());
     }
 

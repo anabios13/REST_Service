@@ -1,7 +1,7 @@
 package by.anabios13.repositories.impl;
 
 import by.anabios13.db.DataSource;
-import by.anabios13.exceptions.CRUDException;
+import by.anabios13.exceptions.*;
 import by.anabios13.models.Project;
 import by.anabios13.repositories.IProjectRepository;
 
@@ -23,23 +23,20 @@ public class ProjectRepository implements IProjectRepository {
         return projectRepository;
     }
 
-    public List<Project> getAllProjects(){
+    public List<Project> getAllProjects() {
         List<Project> projects = new ArrayList<>();
         String query = "SELECT * FROM project";
 
-        try (Connection connection= DataSource.getConnection();
+        try (Connection connection = DataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(query);
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
-                Project project = new Project();
-                int projectId =resultSet.getInt("project_id");
-                project.setProjectId(projectId);
-                project.setProjectName(resultSet.getString("project_name"));
+                Project project = mapResultSetToProject(resultSet);
                 projects.add(project);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new ReadException(e.getMessage());
         }
         return projects;
     }
@@ -53,15 +50,14 @@ public class ProjectRepository implements IProjectRepository {
 
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                       project.setProjectId(generatedKeys.getInt(1));
+                        project.setProjectId(generatedKeys.getInt(1));
                     } else {
-                        throw new SQLException("Creating task failed, no ID obtained.");
+                        throw new CreateException("Creating task failed, no ID obtained.");
                     }
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            // Обработка ошибок
+            throw new CreateException(e.getMessage());
         }
         return project;
     }
@@ -69,49 +65,37 @@ public class ProjectRepository implements IProjectRepository {
     @Override
     public Project getProjectById(int projectId) {
         Project project = new Project();
-        String query = "SELECT * FROM project WHERE project_id="+projectId;
 
-        try (Connection connection= DataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery()) {
+        try (Connection connection = DataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "SELECT * FROM project WHERE project_id=?")) {
 
-                project.setProjectId(resultSet.getInt("project_id"));
-                project.setProjectName(resultSet.getString("project_name"));
+            preparedStatement.setInt(1, projectId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    project = mapResultSetToProject(resultSet);
+                }
+                else return null;
+            }
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            throw new CRUDException("An error occurred while trying to get projects");
+            throw new ReadException(e.getMessage());
         }
         return project;
     }
 
     @Override
-    public void addProject(Project project) {
+    public void updateProject(Project project) {
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
-                     "INSERT INTO project (project_name) VALUES (?)")) {
+                     "UPDATE project SET project_name=? WHERE project_id = ?")) {
 
             preparedStatement.setString(1, project.getProjectName());
+            preparedStatement.setInt(2, project.getProjectId());
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
-            System.out.println(e.getStackTrace());
-            throw new CRUDException("An error occurred while trying to add project");
-        }
-    }
-
-    @Override
-    public void updateProject(Project project)  {
-        try (Connection connection = DataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(
-                     "UPDATE project (project_name) VALUES (?)")) {
-
-            preparedStatement.setString(1, project.getProjectName());
-            preparedStatement.executeUpdate();
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            throw new CRUDException("An error occurred while trying to update project");
+            throw new UpdateException(e.getMessage());
         }
     }
 
@@ -119,15 +103,21 @@ public class ProjectRepository implements IProjectRepository {
     public void deleteProject(int projectId) {
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
-                     "DELETE FROM project WHERE project_id = ?")) {
+                     "DELETE  FROM project WHERE project_id = ?")) {
 
             preparedStatement.setInt(1, projectId);
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-           throw new CRUDException("An error occurred while trying to delete project");
+            throw new DeleteException(e.getMessage());
         }
+    }
+
+    private Project mapResultSetToProject(ResultSet resultSet) throws SQLException {
+        Project project = new Project();
+        project.setProjectId(resultSet.getInt("project_id"));
+        project.setProjectName(resultSet.getString("project_name"));
+        return project;
     }
 }
 

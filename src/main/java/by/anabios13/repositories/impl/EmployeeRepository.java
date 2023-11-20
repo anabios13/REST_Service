@@ -1,18 +1,11 @@
 package by.anabios13.repositories.impl;
 
-import by.anabios13.models.Task;
-import by.anabios13.repositories.IEmployeeRepository;
 import by.anabios13.db.DataSource;
-import by.anabios13.exceptions.CRUDException;
-import by.anabios13.exceptions.CreateException;
-import by.anabios13.exceptions.DeleteException;
-import by.anabios13.exceptions.ReadException;
+import by.anabios13.exceptions.*;
 import by.anabios13.models.Employee;
+import by.anabios13.repositories.IEmployeeRepository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,61 +34,32 @@ public class EmployeeRepository implements IEmployeeRepository {
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
-                Employee employee = new Employee();
-                employee.setEmployeeId(resultSet.getInt("employee_id"));
-                employee.setEmployeeName(resultSet.getString("employee_name"));
-                employee.setTasks(getTasksForEmployee(employee.getEmployeeId()));
+                Employee employee = mapResultSetToEmployee(resultSet);
                 employees.add(employee);
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            throw new CRUDException("");
+            throw new ReadException(e.getMessage());
         }
 
         return employees;
     }
 
-    public List<Task> getTasksForEmployee(int employeeId) {
-        List<Task> taskList = new ArrayList<>();
-
+    @Override
+    public Employee getEmployeeById(int employeeId) {
+        Employee employee = null;
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
-                     "SELECT t.* FROM Task t " +
-                             "JOIN TaskEmployee te ON t.task_id = te.task_id " +
-                             "WHERE te.employee_id = ?")) {
-
+                     "SELECT * FROM employee WHERE employee_id=?"
+             )) {
             preparedStatement.setInt(1, employeeId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                Task task = new Task();
-                task.setTaskId(resultSet.getInt("task_id"));
-                task.setTaskName(resultSet.getString("task_name"));
-                taskList.add(task);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    employee = mapResultSetToEmployee(resultSet);
+                } else return null;
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            // Обработка ошибок
-        }
-
-        return taskList;
-    }
-
-    @Override
-    public Employee getEmployeeById(int employeeId) {
-        Employee employee = new Employee();
-        try (Connection connection = DataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(
-                     "SELECT * FROM employee Where empl" +
-                             "");
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-                if(resultSet.getInt("employee_id")==0)
-                    throw new ReadException("Employee wasn't found");
-                employee.setEmployeeId(resultSet.getInt("employee_id"));
-                employee.setEmployeeName(resultSet.getString("employee_name"));
-        } catch (SQLException e) {
-            throw new CRUDException("");
+            throw new ReadException(e.getMessage());
         }
 
         return employee;
@@ -111,9 +75,7 @@ public class EmployeeRepository implements IEmployeeRepository {
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            throw new CreateException("");
+            throw new CreateException(e.getMessage());
         }
     }
 
@@ -121,14 +83,14 @@ public class EmployeeRepository implements IEmployeeRepository {
     public void updateEmployee(Employee employee) {
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
-                     "UPDATE Employee (employee_name) VALUES (?)")) {
+                     "UPDATE employee SET employee_name=? WHERE employee_id=?")) {
 
             preparedStatement.setString(1, employee.getEmployeeName());
+            preparedStatement.setInt(2, employee.getEmployeeId());
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            // Обработка ошибок
+            throw new UpdateException(e.getMessage());
         }
     }
 
@@ -142,7 +104,37 @@ public class EmployeeRepository implements IEmployeeRepository {
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new DeleteException("");
+            throw new DeleteException(e.getMessage());
         }
+    }
+
+    public Employee save(Employee employee) {
+        try (Connection connection = DataSource.getConnection()) {
+            String sql = "INSERT INTO employee (employee_name) VALUES (?)";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                preparedStatement.setString(1, employee.getEmployeeName());
+                preparedStatement.executeUpdate();
+
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        employee.setEmployeeId(generatedKeys.getInt(1));
+                    } else {
+                        throw new SQLException("Creating task failed, no ID obtained.");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new CreateException(e.getMessage());
+        }
+
+        return employee;
+    }
+
+    private Employee mapResultSetToEmployee(ResultSet resultSet) throws SQLException {
+        Employee employee = new Employee();
+        employee.setEmployeeId(resultSet.getInt("employee_id"));
+        employee.setEmployeeName(resultSet.getString("employee_name"));
+
+        return employee;
     }
 }

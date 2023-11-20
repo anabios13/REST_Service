@@ -11,7 +11,7 @@ public interface IProjectRepository {
 
     Project getProjectById(int projectId);
 
-    void addProject(Project project);
+    Project save(Project project);
 
     void updateProject(Project project);
 
