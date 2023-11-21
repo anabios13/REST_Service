@@ -1,22 +1,11 @@
 package by.anabios13.serviceTests;
 
 
-import by.anabios13.dto.EmployeeDTO;
-import by.anabios13.exceptions.UpdateException;
-import by.anabios13.models.Employee;
 import by.anabios13.repositories.impl.EmployeeRepository;
 import by.anabios13.services.impl.EmployeeService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class EmployeeServiceTest {
 

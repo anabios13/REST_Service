@@ -16,7 +16,7 @@ import java.util.List;
 @WebServlet("/tasks")
 public class TaskServlet extends HttpServlet {
 
-    private final ITaskService taskService; // Импортируйте ваш сервис
+    private final ITaskService taskService;
     private final Gson gson = new Gson();
 
     public TaskServlet() {
