@@ -1,3 +1,0 @@
-db.url=jdbc:postgresql://localhost:your_port/your_db_name
-db.username=your_username
-db.password=your_password
