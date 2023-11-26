@@ -11,6 +11,8 @@ public class Task {
 
     private List<Employee> performers;
 
+    private EmployeeRepository employeeRepository = new EmployeeRepository();
+
     public Task() {
     }
 
@@ -38,7 +40,7 @@ public class Task {
     public List<Employee> getPerformers() {
 
         if (performers == null) {
-            performers = EmployeeRepository.getEmployeeRepository().getAllEmployees();
+            performers = employeeRepository.getAllEmployees();
         }
         return performers;
     }

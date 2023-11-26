@@ -21,8 +21,8 @@ import java.util.List;
 @Tag("DockerRequired")
 class TaskRepositoryTest {
 
-    private TaskRepository taskRepository = TaskRepository.gatTaskRepository();
-    private ProjectRepository projectRepository = ProjectRepository.getProjectRepository();
+    private TaskRepository taskRepository = new TaskRepository();
+    private ProjectRepository projectRepository = new ProjectRepository();
 
     private static JdbcDatabaseDelegate jdbcDatabaseDelegate;
 

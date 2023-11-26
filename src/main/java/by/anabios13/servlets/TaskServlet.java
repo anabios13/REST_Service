@@ -1,14 +1,17 @@
 package by.anabios13.servlets;
 
+import by.anabios13.dto.TaskDTO;
+import by.anabios13.exceptions.ReadException;
+import by.anabios13.mappers.impl.TaskMapper;
+import by.anabios13.repositories.impl.TaskRepository;
+import by.anabios13.services.ITaskService;
 import by.anabios13.services.impl.TaskService;
 import com.google.gson.Gson;
-import by.anabios13.dto.TaskDTO;
-import by.anabios13.services.ITaskService;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 
 import java.io.IOException;
 import java.util.List;
@@ -16,11 +19,27 @@ import java.util.List;
 @WebServlet("/tasks")
 public class TaskServlet extends HttpServlet {
 
-    private final ITaskService taskService;
-    private final Gson gson = new Gson();
+
+    private ITaskService taskService;
+    private  Gson gson;
 
     public TaskServlet() {
-        this.taskService = new TaskService();
+    }
+
+    public void setTaskService(ITaskService taskService) {
+        this.taskService = taskService;
+    }
+
+    public void setGson(Gson gson) {
+        this.gson = gson;
+    }
+
+    @Override
+    public void init() throws ServletException {
+        gson = new Gson();
+        TaskRepository taskRepository = new TaskRepository();
+        TaskMapper taskMapper = new TaskMapper();
+        taskService = new TaskService(taskRepository,taskMapper);
     }
 
     @Override
@@ -29,7 +48,11 @@ public class TaskServlet extends HttpServlet {
         if (req.getParameter("taskId") != null) {
             // Получение задачи по идентификатору
             int taskId = Integer.parseInt(req.getParameter("taskId"));
+
             TaskDTO task = taskService.getTaskById(taskId);
+            if (task==null){
+                throw new ReadException("Task with ID: "+taskId+" wasn't found");
+            }
             String json = gson.toJson(task);
             resp.setContentType("application/json");
             resp.getWriter().write(json);

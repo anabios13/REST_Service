@@ -18,7 +18,7 @@ import java.util.List;
 @Tag("DockerRequired")
 class EmployeeRepositoryTest {
 
-    private EmployeeRepository employeeRepository = EmployeeRepository.getEmployeeRepository();
+    private EmployeeRepository employeeRepository = new EmployeeRepository();
     private static JdbcDatabaseDelegate jdbcDatabaseDelegate;
 
     @BeforeAll

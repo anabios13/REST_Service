@@ -1,6 +1,8 @@
 package by.anabios13.servlets;
 
 import by.anabios13.dto.ProjectDTO;
+import by.anabios13.mappers.impl.ProjectMapper;
+import by.anabios13.repositories.impl.ProjectRepository;
 import by.anabios13.services.impl.ProjectService;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
@@ -14,10 +16,24 @@ import java.util.List;
 
 @WebServlet("/projects")
 public class ProjectServlet extends HttpServlet {
-    private final ProjectService projectService = new ProjectService();
+    private ProjectService projectService;
+
+    public ProjectServlet() {
+    }
+
+    public void setProjectService(ProjectService projectService) {
+        this.projectService = projectService;
+    }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void init() throws ServletException {
+        ProjectMapper projectMapper = new ProjectMapper();
+        ProjectRepository projectRepository = new ProjectRepository();
+        projectService = new ProjectService(projectRepository,projectMapper);
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String projectIdParam = request.getParameter("projectId");
 
         if (projectIdParam != null && !projectIdParam.isEmpty()) {
@@ -42,7 +58,7 @@ public class ProjectServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Создание или обновление проекта
         String projectName = request.getParameter("projectName");
 
@@ -78,7 +94,7 @@ public class ProjectServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String projectIdParam = request.getParameter("projectId");
         String projectName = request.getParameter("projectName");
 
@@ -101,7 +117,7 @@ public class ProjectServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String projectIdParam = request.getParameter("projectId");
 
         if (projectIdParam != null && !projectIdParam.isEmpty()) {

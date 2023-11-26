@@ -16,17 +16,7 @@ import java.util.List;
 
 public class TaskRepository implements ITaskRepository {
 
-
-    private static TaskRepository taskRepository;
-
-    private TaskRepository() {
-    }
-
-    public static synchronized TaskRepository gatTaskRepository() {
-        if (taskRepository == null) {
-            taskRepository = new TaskRepository();
-        }
-        return taskRepository;
+    public TaskRepository() {
     }
 
     public Task save(Task task, int project_id) {

@@ -17,9 +17,12 @@ import java.util.List;
 @Tag("DockerRequired")
 class ProjectRepositoryTest {
 
-    private ProjectRepository projectRepository = ProjectRepository.getProjectRepository();
+    private ProjectRepository projectRepository = new ProjectRepository();
 
     private static JdbcDatabaseDelegate jdbcDatabaseDelegate;
+
+    ProjectRepositoryTest() {
+    }
 
     @BeforeAll
     static void beforeAll() {

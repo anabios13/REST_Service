@@ -3,7 +3,6 @@ package by.anabios13.services.impl;
 import by.anabios13.dto.TaskDTO;
 import by.anabios13.exceptions.CRUDException;
 import by.anabios13.mappers.ITaskMapper;
-import by.anabios13.mappers.impl.TaskMapper;
 import by.anabios13.models.Task;
 import by.anabios13.repositories.impl.TaskRepository;
 import by.anabios13.services.ITaskService;
@@ -13,10 +12,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TaskService implements ITaskService {
-    private final TaskRepository taskRepository = TaskRepository.gatTaskRepository();
-    private final ITaskMapper taskMapper = new TaskMapper();
+    private final TaskRepository taskRepository;
+    private final ITaskMapper taskMapper;
 
-    // Конструктор и другие методы
+    public TaskService(TaskRepository taskRepository, ITaskMapper taskMapper) {
+        this.taskRepository = taskRepository;
+        this.taskMapper = taskMapper;
+    }
+
 
     public TaskDTO saveTask(TaskDTO taskDTO) {
         Task task = taskMapper.taskDTOToTask(taskDTO);

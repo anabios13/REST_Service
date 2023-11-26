@@ -11,16 +11,7 @@ import java.util.List;
 
 public class ProjectRepository implements IProjectRepository {
 
-    private static ProjectRepository projectRepository;
-
-    private ProjectRepository() {
-    }
-
-    public static synchronized ProjectRepository getProjectRepository() {
-        if (projectRepository == null) {
-            projectRepository = new ProjectRepository();
-        }
-        return projectRepository;
+    public ProjectRepository() {
     }
 
     public List<Project> getAllProjects() {

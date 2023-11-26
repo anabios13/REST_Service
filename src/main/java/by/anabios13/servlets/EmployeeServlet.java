@@ -1,6 +1,8 @@
 package by.anabios13.servlets;
 
 import by.anabios13.dto.EmployeeDTO;
+import by.anabios13.mappers.impl.EmployeeMapper;
+import by.anabios13.repositories.impl.EmployeeRepository;
 import by.anabios13.services.impl.EmployeeService;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
@@ -14,14 +16,27 @@ import java.util.List;
 
 @WebServlet("/employees")
 public class EmployeeServlet extends HttpServlet {
-    private final EmployeeService employeeService = new EmployeeService();
+    private EmployeeService employeeService;
+
+    public EmployeeServlet() {
+    }
+
+    public void setEmployeeService(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void init() throws ServletException {
+        EmployeeMapper employeeMapper = new EmployeeMapper();
+        EmployeeRepository employeeRepository = new EmployeeRepository();
+        employeeService = new EmployeeService(employeeRepository,employeeMapper);
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String employeeIdParam = request.getParameter("employeeId");
 
         if (employeeIdParam != null && !employeeIdParam.isEmpty()) {
-            // Получение сотрудника по ID
             int employeeId = Integer.parseInt(employeeIdParam);
             EmployeeDTO employeeDTO = employeeService.getEmployeeById(employeeId);
 
@@ -41,7 +56,7 @@ public class EmployeeServlet extends HttpServlet {
         }
     }
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Создание или обновление сотрудника
         String employeeName = request.getParameter("employeeName");
 
@@ -77,7 +92,7 @@ public class EmployeeServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String employeeIdParam = request.getParameter("employeeId");
         String employeeName = request.getParameter("employeeName");
 
@@ -100,7 +115,7 @@ public class EmployeeServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String employeeIdParam = request.getParameter("employeeId");
 
         if (employeeIdParam != null && !employeeIdParam.isEmpty()) {

@@ -9,7 +9,7 @@ public class TaskMapper implements ITaskMapper {
     public TaskDTO taskToTaskDTO(Task task) {
         TaskDTO taskDTO = new TaskDTO();
         taskDTO.setTaskId(task.getTaskId());
-        taskDTO.setTaskName(taskDTO.getTaskName());
+        taskDTO.setTaskName(task.getTaskName());
         taskDTO.setPerformers(task.getPerformers());
         return  taskDTO;
     }

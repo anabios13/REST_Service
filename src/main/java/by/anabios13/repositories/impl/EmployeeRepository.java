@@ -11,16 +11,7 @@ import java.util.List;
 
 public class EmployeeRepository implements IEmployeeRepository {
 
-    private static EmployeeRepository employeeRepository;
-
-    private EmployeeRepository() {
-    }
-
-    public static synchronized EmployeeRepository getEmployeeRepository() {
-        if (employeeRepository == null) {
-            employeeRepository = new EmployeeRepository();
-        }
-        return employeeRepository;
+    public EmployeeRepository() {
     }
 
     @Override
@@ -46,7 +37,7 @@ public class EmployeeRepository implements IEmployeeRepository {
 
     @Override
     public Employee getEmployeeById(int employeeId) {
-        Employee employee = null;
+        Employee employee;
         try (Connection connection = DataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "SELECT * FROM employee WHERE employee_id=?"

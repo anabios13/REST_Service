@@ -3,7 +3,6 @@ package by.anabios13.services.impl;
 
 import by.anabios13.dto.ProjectDTO;
 import by.anabios13.mappers.IProjectMapper;
-import by.anabios13.mappers.impl.ProjectMapper;
 import by.anabios13.models.Project;
 import by.anabios13.repositories.impl.ProjectRepository;
 import by.anabios13.services.IProjectService;
@@ -12,8 +11,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ProjectService implements IProjectService {
-    private final ProjectRepository projectRepository = ProjectRepository.getProjectRepository();
-    private final IProjectMapper projectMapper = new ProjectMapper();
+
+    private final ProjectRepository projectRepository;
+    // private final ProjectRepository projectRepository = ProjectRepository.getProjectRepository();
+    private final IProjectMapper projectMapper;
+
+    public ProjectService(ProjectRepository projectRepository, IProjectMapper projectMapper) {
+        this.projectRepository = projectRepository;
+        this.projectMapper = projectMapper;
+    }
 
     public ProjectDTO saveProject(ProjectDTO projectDTO) {
         Project project = projectMapper.projectDTOToProject(projectDTO);

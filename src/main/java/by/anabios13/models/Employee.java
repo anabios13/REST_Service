@@ -11,6 +11,8 @@ public class Employee {
 
     private List<Task> tasks;
 
+    private TaskRepository taskRepository=new TaskRepository();
+
     public Employee(){}
 
     public Employee(String employeeName) {
@@ -35,7 +37,7 @@ public class Employee {
 
     public List<Task> getTasks() {
         if (tasks == null) {
-            tasks = TaskRepository.gatTaskRepository().findAll();
+            tasks = taskRepository.findAll();
         }
         return tasks;
     }

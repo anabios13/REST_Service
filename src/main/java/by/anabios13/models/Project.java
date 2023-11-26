@@ -11,6 +11,8 @@ public class Project {
 
     private List<Task> tasks;
 
+    private TaskRepository taskRepository=new TaskRepository();
+
     public Project(){}
 
 
@@ -37,7 +39,7 @@ public class Project {
 
     public List<Task> getTasks() {
         if (tasks == null) {
-            tasks = TaskRepository.gatTaskRepository().findAll();
+            tasks = taskRepository.findAll();
         }
         return tasks;
     }
