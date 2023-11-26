@@ -1,12 +1,11 @@
 package by.anabios13.servletTests;
 
 import by.anabios13.dto.EmployeeDTO;
-import by.anabios13.services.IEmployeeService;
 import by.anabios13.services.impl.EmployeeService;
 import by.anabios13.servlets.EmployeeServlet;
-import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,7 +17,6 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 class EmployeeServletTest {
@@ -62,7 +60,7 @@ class EmployeeServletTest {
         employeeServlet.doGet(request, response);
 
         // Assert
-        assertTrue(stringWriter.toString().contains("Test Employee"));
+        Assertions.assertTrue(stringWriter.toString().contains("Test Employee"));
         verify(response).setContentType("application/json");
     }
 
@@ -89,8 +87,8 @@ class EmployeeServletTest {
         employeeServlet.doGet(request, response);
 
         // Assert
-        assertTrue(stringWriter.toString().contains("Employee 1"));
-        assertTrue(stringWriter.toString().contains("Employee 2"));
+        Assertions.assertTrue(stringWriter.toString().contains("Employee 1"));
+        Assertions.assertTrue(stringWriter.toString().contains("Employee 2"));
         verify(response).setContentType("application/json");
     }
 
@@ -111,7 +109,7 @@ class EmployeeServletTest {
         employeeServlet.doPost(request, response);
 
         // Assert
-        assertTrue(stringWriter.toString().contains("Test Employee"));
+        Assertions.assertTrue(stringWriter.toString().contains("Test Employee"));
         verify(response).setContentType("application/json");
     }
 
@@ -135,7 +133,7 @@ class EmployeeServletTest {
         employeeServlet.doPut(request, response);
 
         // Assert
-        assertTrue(stringWriter.toString().contains("Updated Employee"));
+        Assertions.assertTrue(stringWriter.toString().contains("Updated Employee"));
         verify(response).setContentType("application/json");
     }
 

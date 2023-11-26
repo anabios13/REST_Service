@@ -1,21 +1,18 @@
-package by.anabios13.servletTest;
+package by.anabios13.servletTests;
 
 import by.anabios13.dto.ProjectDTO;
-import by.anabios13.services.IProjectService;
 import by.anabios13.services.impl.ProjectService;
 import by.anabios13.servlets.ProjectServlet;
-import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.io.BufferedReader;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +61,7 @@ class ProjectServletTest {
         projectServlet.doGet(request, response);
 
         // Assert
-        assertTrue(stringWriter.toString().contains("Test Project"));
+        Assertions.assertTrue(stringWriter.toString().contains("Test Project"));
         verify(response).setContentType("application/json");
 
     }
@@ -92,8 +89,8 @@ class ProjectServletTest {
         projectServlet.doGet(request, response);
 
         // Assert
-        assertTrue(stringWriter.toString().contains("Project 1"));
-        assertTrue(stringWriter.toString().contains("Project 2"));
+        Assertions.assertTrue(stringWriter.toString().contains("Project 1"));
+        Assertions.assertTrue(stringWriter.toString().contains("Project 2"));
         verify(response).setContentType("application/json");
     }
 
@@ -114,7 +111,7 @@ class ProjectServletTest {
         projectServlet.doPost(request, response);
 
         // Assert
-        assertTrue(stringWriter.toString().contains("Test Project"));
+        Assertions.assertTrue(stringWriter.toString().contains("Test Project"));
         verify(response).setContentType("application/json");
     }
 
@@ -138,7 +135,7 @@ class ProjectServletTest {
         projectServlet.doPut(request, response);
 
         // Assert
-        assertTrue(stringWriter.toString().contains("Updated Project"));
+        Assertions.assertTrue(stringWriter.toString().contains("Updated Project"));
         verify(response).setContentType("application/json");
     }
 

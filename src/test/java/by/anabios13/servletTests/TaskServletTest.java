@@ -1,16 +1,14 @@
-package by.anabios13.servletTest;
+package by.anabios13.servletTests;
 
 import by.anabios13.dto.TaskDTO;
 import by.anabios13.services.ITaskService;
 import by.anabios13.servlets.TaskServlet;
-import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -21,8 +19,6 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class TaskServletTest {
@@ -69,7 +65,7 @@ class TaskServletTest {
         taskServlet.doGet(request, response);
 
         // Assert
-        assertTrue(stringWriter.toString().contains("Test Task"));
+        Assertions.assertTrue(stringWriter.toString().contains("Test Task"));
         verify(response).setContentType("application/json");
     }
 
@@ -96,8 +92,8 @@ class TaskServletTest {
         taskServlet.doGet(request, response);
 
         // Assert
-        assertTrue(stringWriter.toString().contains("Task 1"));
-        assertTrue(stringWriter.toString().contains("Task 2"));
+        Assertions.assertTrue(stringWriter.toString().contains("Task 1"));
+        Assertions.assertTrue(stringWriter.toString().contains("Task 2"));
         verify(response).setContentType("application/json");
     }
 
@@ -118,7 +114,7 @@ class TaskServletTest {
         taskServlet.doPost(request, response);
 
         // Assert
-        assertTrue(stringWriter.toString().contains("Test Task"));
+        Assertions.assertTrue(stringWriter.toString().contains("Test Task"));
         verify(response).setContentType("application/json");
 
     }
