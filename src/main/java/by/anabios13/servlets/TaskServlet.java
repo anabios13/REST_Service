@@ -1,5 +1,6 @@
 package by.anabios13.servlets;
 
+import by.anabios13.db.DataSource;
 import by.anabios13.dto.TaskDTO;
 import by.anabios13.exceptions.ReadException;
 import by.anabios13.mappers.impl.TaskMapper;
@@ -37,7 +38,8 @@ public class TaskServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         gson = new Gson();
-        TaskRepository taskRepository = new TaskRepository();
+        DataSource dataSource = new DataSource();
+        TaskRepository taskRepository = new TaskRepository(dataSource);
         TaskMapper taskMapper = new TaskMapper();
         taskService = new TaskService(taskRepository,taskMapper);
     }

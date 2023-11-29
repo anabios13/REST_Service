@@ -8,6 +8,7 @@ import by.anabios13.repositories.impl.ProjectRepository;
 import by.anabios13.repositories.impl.TaskRepository;
 import by.anabios13.util.PostgreSQLContainer;
 import org.junit.jupiter.api.*;
+import org.mockito.Mock;
 import org.testcontainers.ext.ScriptUtils;
 import org.testcontainers.jdbc.JdbcDatabaseDelegate;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -21,8 +22,11 @@ import java.util.List;
 @Tag("DockerRequired")
 class TaskRepositoryTest {
 
-    private TaskRepository taskRepository = new TaskRepository();
-    private ProjectRepository projectRepository = new ProjectRepository();
+    @Mock
+    private DataSource dataSource;
+
+    private TaskRepository taskRepository;
+    private ProjectRepository projectRepository;
 
     private static JdbcDatabaseDelegate jdbcDatabaseDelegate;
 
@@ -39,9 +43,12 @@ class TaskRepositoryTest {
 
     @BeforeEach
     void setUp() {
+        dataSource = new DataSource();
+        projectRepository = new ProjectRepository(dataSource);
+        taskRepository = new TaskRepository(dataSource);
         ScriptUtils.runInitScript(jdbcDatabaseDelegate, PostgreSQLContainer.INIT_SQL);
             // Очистка таблицы Task перед каждым тестом
-            try (Connection connection = DataSource.getConnection();
+            try (Connection connection = dataSource.getConnection();
                  PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM task")) {
                 preparedStatement.executeUpdate();
             } catch (Exception e) {

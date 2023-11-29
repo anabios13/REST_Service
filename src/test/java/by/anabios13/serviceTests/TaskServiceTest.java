@@ -1,6 +1,7 @@
 package by.anabios13.serviceTests;
 
 
+import by.anabios13.db.DataSource;
 import by.anabios13.dto.TaskDTO;
 import by.anabios13.exceptions.UpdateException;
 import by.anabios13.mappers.impl.TaskMapper;
@@ -8,11 +9,17 @@ import by.anabios13.models.Project;
 import by.anabios13.models.Task;
 import by.anabios13.repositories.impl.TaskRepository;
 import by.anabios13.services.impl.TaskService;
+import by.anabios13.util.PostgreSQLContainer;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.testcontainers.ext.ScriptUtils;
+import org.testcontainers.jdbc.JdbcDatabaseDelegate;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,15 +29,31 @@ import static org.mockito.Mockito.*;
 class TaskServiceTest {
 
     @Mock
+    DataSource dataSource;
+    @Mock
     private TaskRepository taskRepository;
 
     private TaskMapper taskMapper=new TaskMapper();
     private TaskService taskService;
+    private static JdbcDatabaseDelegate jdbcDatabaseDelegate;
+
+    @BeforeAll
+    static void beforeAll() {
+        PostgreSQLContainer.container.start();
+        jdbcDatabaseDelegate = new JdbcDatabaseDelegate(PostgreSQLContainer.container, "");
+    }
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         taskService = new TaskService(taskRepository,taskMapper);
+        ScriptUtils.runInitScript(jdbcDatabaseDelegate, PostgreSQLContainer.INIT_SQL);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM employee")) {
+            preparedStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

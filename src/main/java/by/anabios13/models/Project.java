@@ -1,5 +1,6 @@
 package by.anabios13.models;
 
+import by.anabios13.db.DataSource;
 import by.anabios13.repositories.impl.TaskRepository;
 
 import java.util.List;
@@ -11,7 +12,8 @@ public class Project {
 
     private List<Task> tasks;
 
-    private TaskRepository taskRepository=new TaskRepository();
+    private final DataSource dataSource = new DataSource();
+    private TaskRepository taskRepository=new TaskRepository(dataSource);
 
     public Project(){}
 

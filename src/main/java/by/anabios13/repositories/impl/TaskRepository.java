@@ -16,11 +16,13 @@ import java.util.List;
 
 public class TaskRepository implements ITaskRepository {
 
-    public TaskRepository() {
+    private final DataSource dataSource;
+    public TaskRepository(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     public Task save(Task task, int project_id) {
-        try (Connection connection = DataSource.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             String sql = "INSERT INTO Task (task_name, project_id) VALUES (?, ?)";
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 preparedStatement.setString(1, task.getTaskName());
@@ -45,7 +47,7 @@ public class TaskRepository implements ITaskRepository {
     public Task findById(int taskId) {
         Task task = null;
 
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "SELECT * FROM Task WHERE task_id = ?")
         ) {
@@ -67,7 +69,7 @@ public class TaskRepository implements ITaskRepository {
     public List<Task> findAll() {
         List<Task> tasks = new ArrayList<>();
 
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Task");
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
@@ -84,7 +86,7 @@ public class TaskRepository implements ITaskRepository {
     }
 
     public void update(Task task, int project_id) {
-        try (Connection connection = DataSource.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             String sql = "UPDATE Task SET task_name = ?, project_id = ? WHERE task_id = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 preparedStatement.setString(1, task.getTaskName());
@@ -98,7 +100,7 @@ public class TaskRepository implements ITaskRepository {
     }
 
     public void deleteById(int taskId) {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Task WHERE task_id = ?")) {
 
             preparedStatement.setInt(1, taskId);

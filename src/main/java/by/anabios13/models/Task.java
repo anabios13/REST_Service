@@ -1,5 +1,6 @@
 package by.anabios13.models;
 
+import by.anabios13.db.DataSource;
 import by.anabios13.repositories.impl.EmployeeRepository;
 
 import java.util.List;
@@ -11,7 +12,8 @@ public class Task {
 
     private List<Employee> performers;
 
-    private EmployeeRepository employeeRepository = new EmployeeRepository();
+    private final DataSource dataSource = new DataSource();
+    private EmployeeRepository employeeRepository = new EmployeeRepository(dataSource);
 
     public Task() {
     }

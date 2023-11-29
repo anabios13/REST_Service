@@ -11,14 +11,17 @@ import java.util.List;
 
 public class EmployeeRepository implements IEmployeeRepository {
 
-    public EmployeeRepository() {
+    public final DataSource dataSource;
+
+    public EmployeeRepository(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
     public List<Employee> getAllEmployees() {
         List<Employee> employees = new ArrayList<>();
 
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "SELECT * FROM employee"
              );
@@ -38,7 +41,7 @@ public class EmployeeRepository implements IEmployeeRepository {
     @Override
     public Employee getEmployeeById(int employeeId) {
         Employee employee;
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "SELECT * FROM employee WHERE employee_id=?"
              )) {
@@ -58,7 +61,7 @@ public class EmployeeRepository implements IEmployeeRepository {
 
     @Override
     public void addEmployee(Employee employee) {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "INSERT INTO employee (employee_name) VALUES (?)")) {
 
@@ -72,7 +75,7 @@ public class EmployeeRepository implements IEmployeeRepository {
 
     @Override
     public void updateEmployee(Employee employee) {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "UPDATE employee SET employee_name=? WHERE employee_id=?")) {
 
@@ -87,7 +90,7 @@ public class EmployeeRepository implements IEmployeeRepository {
 
     @Override
     public void deleteEmployee(int employeeId) {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "DELETE FROM Employee WHERE employee_id = ?")) {
 
@@ -100,7 +103,7 @@ public class EmployeeRepository implements IEmployeeRepository {
     }
 
     public Employee save(Employee employee) {
-        try (Connection connection = DataSource.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             String sql = "INSERT INTO employee (employee_name) VALUES (?)";
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 preparedStatement.setString(1, employee.getEmployeeName());

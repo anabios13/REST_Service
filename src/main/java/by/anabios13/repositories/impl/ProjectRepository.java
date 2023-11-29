@@ -10,15 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectRepository implements IProjectRepository {
+    private  final DataSource dataSource;
 
-    public ProjectRepository() {
+    public ProjectRepository(DataSource dataSource) {
+        this.dataSource=dataSource;
     }
 
     public List<Project> getAllProjects() {
         List<Project> projects = new ArrayList<>();
         String query = "SELECT * FROM project";
 
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(query);
              ResultSet resultSet = statement.executeQuery()) {
 
@@ -33,7 +35,7 @@ public class ProjectRepository implements IProjectRepository {
     }
 
     public Project save(Project project) {
-        try (Connection connection = DataSource.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             String sql = "INSERT INTO Project (project_name) VALUES (?)";
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 preparedStatement.setString(1, project.getProjectName());
@@ -57,7 +59,7 @@ public class ProjectRepository implements IProjectRepository {
     public Project getProjectById(int projectId) {
         Project project = new Project();
 
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "SELECT * FROM project WHERE project_id=?")) {
 
@@ -77,7 +79,7 @@ public class ProjectRepository implements IProjectRepository {
 
     @Override
     public void updateProject(Project project) {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "UPDATE project SET project_name=? WHERE project_id = ?")) {
 
@@ -92,7 +94,7 @@ public class ProjectRepository implements IProjectRepository {
 
     @Override
     public void deleteProject(int projectId) {
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "DELETE  FROM project WHERE project_id = ?")) {
 

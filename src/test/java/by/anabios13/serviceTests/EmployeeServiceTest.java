@@ -1,16 +1,23 @@
 package by.anabios13.serviceTests;
 
 
+import by.anabios13.db.DataSource;
 import by.anabios13.dto.EmployeeDTO;
 import by.anabios13.mappers.impl.EmployeeMapper;
 import by.anabios13.models.Employee;
 import by.anabios13.repositories.impl.EmployeeRepository;
 import by.anabios13.services.impl.EmployeeService;
+import by.anabios13.util.PostgreSQLContainer;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.testcontainers.ext.ScriptUtils;
+import org.testcontainers.jdbc.JdbcDatabaseDelegate;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,6 +28,10 @@ import static org.mockito.Mockito.*;
 
 class EmployeeServiceTest {
 
+
+    @Mock
+    DataSource dataSource;
+
     @Mock
     private EmployeeRepository employeeRepository;
 
@@ -28,10 +39,25 @@ class EmployeeServiceTest {
 
     private EmployeeService employeeService;
 
+    private static JdbcDatabaseDelegate jdbcDatabaseDelegate;
+
+    @BeforeAll
+    static void beforeAll() {
+        PostgreSQLContainer.container.start();
+        jdbcDatabaseDelegate = new JdbcDatabaseDelegate(PostgreSQLContainer.container, "");
+    }
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         employeeService = new EmployeeService(employeeRepository, employeeMapper);
+        ScriptUtils.runInitScript(jdbcDatabaseDelegate, PostgreSQLContainer.INIT_SQL);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM employee")) {
+            preparedStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

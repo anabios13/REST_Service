@@ -19,10 +19,10 @@ public class DataSource {
     private final static HikariConfig config = new HikariConfig("/db.properties");
     private final static HikariDataSource ds = new HikariDataSource(config);
 
-    private DataSource() {
+    public DataSource() {
     }
 
-    public static Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         return ds.getConnection();
     }
 }

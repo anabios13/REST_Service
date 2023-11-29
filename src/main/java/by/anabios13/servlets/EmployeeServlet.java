@@ -1,5 +1,6 @@
 package by.anabios13.servlets;
 
+import by.anabios13.db.DataSource;
 import by.anabios13.dto.EmployeeDTO;
 import by.anabios13.mappers.impl.EmployeeMapper;
 import by.anabios13.repositories.impl.EmployeeRepository;
@@ -28,7 +29,8 @@ public class EmployeeServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         EmployeeMapper employeeMapper = new EmployeeMapper();
-        EmployeeRepository employeeRepository = new EmployeeRepository();
+        DataSource dataSource = new DataSource();
+        EmployeeRepository employeeRepository = new EmployeeRepository(dataSource);
         employeeService = new EmployeeService(employeeRepository,employeeMapper);
     }
 

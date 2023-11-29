@@ -1,5 +1,6 @@
 package by.anabios13.servlets;
 
+import by.anabios13.db.DataSource;
 import by.anabios13.dto.ProjectDTO;
 import by.anabios13.mappers.impl.ProjectMapper;
 import by.anabios13.repositories.impl.ProjectRepository;
@@ -28,7 +29,8 @@ public class ProjectServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         ProjectMapper projectMapper = new ProjectMapper();
-        ProjectRepository projectRepository = new ProjectRepository();
+        DataSource dataSource = new DataSource();
+        ProjectRepository projectRepository = new ProjectRepository(dataSource);
         projectService = new ProjectService(projectRepository,projectMapper);
     }
 

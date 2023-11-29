@@ -1,5 +1,6 @@
 package by.anabios13.serviceTests;
 
+import by.anabios13.db.DataSource;
 import by.anabios13.dto.ProjectDTO;
 import by.anabios13.exceptions.DeleteException;
 import by.anabios13.exceptions.UpdateException;
@@ -7,12 +8,18 @@ import by.anabios13.mappers.impl.ProjectMapper;
 import by.anabios13.models.Project;
 import by.anabios13.repositories.impl.ProjectRepository;
 import by.anabios13.services.impl.ProjectService;
+import by.anabios13.util.PostgreSQLContainer;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.testcontainers.ext.ScriptUtils;
+import org.testcontainers.jdbc.JdbcDatabaseDelegate;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,9 +29,14 @@ import static org.mockito.Mockito.*;
 class ProjectServiceTest {
 
     @Mock
+    DataSource dataSource;
+
+    @Mock
     private ProjectRepository projectRepository;
 
     private  ProjectMapper projectMapper = new ProjectMapper();
+
+    private static JdbcDatabaseDelegate jdbcDatabaseDelegate;
 
     @InjectMocks
     private ProjectService projectService;
@@ -33,6 +45,19 @@ class ProjectServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         projectService = new ProjectService(projectRepository,projectMapper);
+        ScriptUtils.runInitScript(jdbcDatabaseDelegate, PostgreSQLContainer.INIT_SQL);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM employee")) {
+            preparedStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @BeforeAll
+    static void beforeAll() {
+        PostgreSQLContainer.container.start();
+        jdbcDatabaseDelegate = new JdbcDatabaseDelegate(PostgreSQLContainer.container, "");
     }
 
     @Test
